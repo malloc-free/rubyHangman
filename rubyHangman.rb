@@ -97,9 +97,7 @@ class Hangman
 	end
 end
 
-
-	#For ASCII hangman.
-
+#For ASCII hangman.
 BEGIN {
 	$hangman =  ["\n"]
 	$hangman[0] <<  "\n"
@@ -182,9 +180,18 @@ BEGIN {
 }
 
 if __FILE__ == $0
-	guessWord = "test this"
-	currentGame = Hangman.new guessWord
-	currentGame.start
+	#Create an array for the phrases and populate it with the phrases obtained
+	#from phrases.txt
+	phrases = Array.new
+	IO.foreach("phrases.txt") {|block| phrases[phrases.size] = block.chomp}
+	if phrases.size == 0
+		puts "Abort, cannot find file phrases.txt"
+	else
+		#Create a game, pass in the phrase word.
+		guessWord = phrases[rand(phrases.size)]
+		currentGame = Hangman.new guessWord
+		currentGame.start
+	end
 	#alpha.each do |key, value|
 	#	puts "key = #{key}, value = #{value}"
 	#end
