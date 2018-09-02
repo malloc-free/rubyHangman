@@ -57,10 +57,11 @@ class Hangman
 			#if quitting then bail.
 			if input == "quit"
 				@quit = true
+			#Test for entire phrase.
 			elsif input.size > 1
 				if input == @guessPhrase
-					@quit = true
 					puts "** Game Over, phrase correctly guessed **"
+					@quit = true	
 					puts $hangman[@hangmanIteration]
 					puts @guessPhrase
 			    else
