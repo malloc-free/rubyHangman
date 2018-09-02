@@ -1,7 +1,8 @@
 class Hangman
 	@iteration = 0
 	@letterCount = 0
-	@target = ""
+	@target = "test"
+	@noose = ""
 end
 
 if __FILE__ == $0
@@ -96,11 +97,26 @@ if __FILE__ == $0
 	#Quit when this true
 	quit = false
 	#This is used to display current word guesses.
-	noose = String.new("")
+	#noose = String.new("")
 	#The test word until we have some other mechanisim
-	myStr = String.new("test")
+	#@myStr = String.new("test")
 	#Add blanks for letters.
-	noose << "_" while noose.length < myStr.length
+	#noose << "_" while noose.length < myStr.length
+	
+	#Test string
+	myStr2 = String.new("test this")
+	#Put
+	noose2 = ""
+	count2 = 0
+	myStr2.each_char{|c|
+		if c == " "
+			noose2 << " "
+		else
+			noose2 << "_"
+			count2 += 1
+		end
+	}
+	puts "noose2 = #{noose2}\n"
 	iteration = 0
 	letterCount = 0
 	
@@ -108,7 +124,7 @@ if __FILE__ == $0
 	until quit
 		#display data
 		puts hangman[iteration]
-		puts noose
+		puts noose2
 		puts "iteration = #{iteration}"
 		input = gets.chomp
 		puts "Entered #{input}"
@@ -125,7 +141,7 @@ if __FILE__ == $0
 			#The letter has not been checked already, so mark it and test the string
 			else
 				alpha[input] = true
-				oldval = myStr.index(input)
+				oldval = myStr2.index(input)
 				#If we don't have a match, then mark it as such. 
 				#Then test for game over.
 				if oldval == nil
@@ -134,8 +150,8 @@ if __FILE__ == $0
 					if iteration == hangman.size - 1
 						puts "game over"
 						quit = true
-						puts hangman[hangman.size   1]
-						puts myStr
+						puts hangman[hangman.size - 1]
+						puts myStr2
 					end
 				#We have a match. Test string until we have all instances of letter.
 				else
@@ -143,14 +159,14 @@ if __FILE__ == $0
 						letterCount += 1
 						puts "letterCount = #{letterCount}"
 						puts "index = #{oldval}"
-						noose[oldval] = input
+						noose2[oldval] = input
 						#If we have the correct word size, then the game is over.
-						if letterCount == myStr.size
+						if letterCount == count2
 							puts "Game over, corrent!"
 							quit = true
 						#Test the string for more instances.
 						else 
-							oldval = myStr.index(input, oldval + 1)
+							oldval = myStr2.index(input, oldval + 1)
 						end
 					end
 				end
