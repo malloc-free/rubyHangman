@@ -1,18 +1,31 @@
 
 class Hangman
 	def initialize(guessWord)
+		#The word/phrase to be guessed
 		@guessWord = guessWord
+		#The number of letters in the word that have been guessed.
 		@letterCount = 0
+		#Used to show the letters in the phrase that have been guessed
+		#/to be guessed. Used for visualization purposes.
 		@targetWord = ""
+		#Tracks progress of the current hangman.
 		@iteration = 0
+		#The total size of all the words in the phrase to be guessed.
 		@wordSize = 0
+		#Are we in a quit state in the game, this is when either 'quit' is typed
+		#into the prompt, the user correctly guesses the entire phrase, or the
+		#hangman is complete.
 		@quit = false
+		#Both to track what letters have been used and also filter out input.
 		@alpha = {"a" => false, "b" => false, "c" => false, "d" => false, "e" => false,
 			 "f" => false, "g" => false, "h" => false, "i" => false, "j" => false,
 			 "k" => false, "l" => false, "m" => false, "n" => false, "o" => false, 
 			 "p" => false, "q" => false, "r" => false, "s" => false, "t" => false, 
 			 "u" => false, "v" => false, "w" => false, "x" => false, "y" => false, 
 			 "z" => false}
+			 
+		#Build the targetWord from the guess word. Spaces are to be filtered out,
+		#and blanks put in for each of the letters in the phrase.
 		@guessWord.each_char{|c|
 			if c == " "
 				@targetWord << " "
@@ -60,8 +73,8 @@ class Hangman
 		else
 			@alpha[input] = true
 			atIndex = @guessWord.index(input)
-			#If we don't have a match, then mark it as such. 
-			#Then test for game over.
+			#If we don't have a match, then mark it as such,
+			#then test for game over.
 			if atIndex == nil
 				indexNil
 			#We have a match. Test string until we have all instances of letter.
@@ -81,6 +94,7 @@ class Hangman
 			puts @guessWord
 		end
 	end
+	
 	def scanWord(input, atIndex)
 		while atIndex != nil
 			@letterCount += 1
@@ -88,6 +102,8 @@ class Hangman
 			#If we have the correct word size, then the game is over.
 			if @letterCount == @wordSize
 				puts "Game Over, correct phrase!"
+				puts $hangman[@iteration]
+				puts @guessWord
 				@quit = true
 			#Test the string for more instances.
 			else 
@@ -184,10 +200,11 @@ if __FILE__ == $0
 	#from phrases.txt
 	phrases = Array.new
 	IO.foreach("phrases.txt") {|block| phrases[phrases.size] = block.chomp}
+	#Nothing in the array, something is wrong.
 	if phrases.size == 0
 		puts "Abort, cannot find file phrases.txt"
 	else
-		#Create a game, pass in the phrase word.
+		#Create a game, pass in the phrase, and start.
 		guessWord = phrases[rand(phrases.size)]
 		currentGame = Hangman.new guessWord
 		currentGame.start
