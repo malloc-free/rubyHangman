@@ -24,7 +24,7 @@ class Hangman
 			 "u" => false, "v" => false, "w" => false, "x" => false, "y" => false, 
 			 "z" => false}
 			 
-		#Build the targetWord from the guess word. Spaces are to be filtered out,
+		#Build the targetWord from guessWord. Spaces are to be filtered out,
 		#and blanks put in for each of the letters in the phrase.
 		@guessWord.each_char{|c|
 			if c == " "
@@ -45,22 +45,29 @@ class Hangman
 	
 	def start()
 		until @quit
-			#display data
+			#display data.
 			puts $hangman[@iteration]
 			puts @targetWord
+			
+			#Get input from the user.
 			input = gets.chomp
 			puts "Entered #{input}"
 	
-			#test input
-			#if quitting then bail
+			#test input.
+			#if quitting then bail.
 			if input == "quit"
 				@quit = true
+			elsif input == @guessWord
+				@quit = true
+				puts "Game Over, phrase correctly guessed"
+				puts $hangman[@iteration]
+				puts @guessWord
 			#else check a letter has been input from the hash
 			elsif @alpha.has_key?(input)
 				testLetter input
 			else
 			#Error message for incorrect input.
-				puts "please enter a letter"
+				puts "please enter a letter a-z"
 			end
 		end
 	end
@@ -199,16 +206,21 @@ if __FILE__ == $0
 	#Create an array for the phrases and populate it with the phrases obtained
 	#from phrases.txt
 	phrases = Array.new
-	IO.foreach("phrases.txt") {|block| phrases[phrases.size] = block.chomp}
-	#Nothing in the array, something is wrong.
-	if phrases.size == 0
-		puts "Abort, cannot find file phrases.txt"
-	else
-		#Create a game, pass in the phrase, and start.
-		guessWord = phrases[rand(phrases.size)]
-		currentGame = Hangman.new guessWord
-		currentGame.start
+	begin
+		IO.foreach("phrases.txt") {|block| phrases[phrases.size] = block.chomp}
+		if phrases.size == 0
+			puts "Abort, phrases is an empty file."
+		else
+			#Create a game, pass in the phrase, and start.
+			guessWord = phrases[rand(phrases.size)]
+			currentGame = Hangman.new guessWord
+			currentGame.start
+		end
+	rescue
+		puts "Cannot open file phrases.txt, aborting"
 	end
+	#Nothing in the array, something is wrong.
+	
 	#alpha.each do |key, value|
 	#	puts "key = #{key}, value = #{value}"
 	#end
