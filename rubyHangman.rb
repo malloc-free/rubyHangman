@@ -57,17 +57,22 @@ class Hangman
 			#if quitting then bail.
 			if input == "quit"
 				@quit = true
-			elsif input == @guessWord
-				@quit = true
-				puts "Game Over, phrase correctly guessed"
-				puts $hangman[@iteration]
-				puts @guessWord
+			elsif input.size > 1
+				if input == @guessWord
+					@quit = true
+					puts "Game Over, phrase correctly guessed"
+					puts $hangman[@iteration]
+					puts @guessWord
+			    else
+					puts "Not the correct phrase"
+					@iteration += 1
+				end
 			#else check a letter has been input from the hash
 			elsif @alpha.has_key?(input)
 				testLetter input
 			else
 			#Error message for incorrect input.
-				puts "please enter a letter a-z"
+				puts "please either enter a letter a-z, the entire phrase to guess, or quit to exit"
 			end
 		end
 	end
