@@ -131,10 +131,10 @@ if __FILE__ == $0
 				if oldval == nil
 					iteration += 1
 					#quit if we have a hangman.
-					if iteration == 9
+					if iteration == hangman.size - 1
 						puts "game over"
 						quit = true
-						puts hangman[9]
+						puts hangman[hangman.size   1]
 						puts myStr
 					end
 				#We have a match. Test string until we have all instances of letter.
