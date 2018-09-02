@@ -1,17 +1,17 @@
 
 class Hangman
-	def initialize(guessWord)
+	def initialize(guessPhrase)
 		#The word/phrase to be guessed
-		@guessWord = guessWord
+		@guessPhrase = guessPhrase
 		#The number of letters in the word that have been guessed.
 		@letterCount = 0
 		#Used to show the letters in the phrase that have been guessed
 		#/to be guessed. Used for visualization purposes.
-		@targetWord = ""
+		@displayPhrase = ""
 		#Tracks progress of the current hangman.
-		@iteration = 0
+		@hangmanIteration = 0
 		#The total size of all the words in the phrase to be guessed.
-		@wordSize = 0
+		@phraseCount = 0
 		#Are we in a quit state in the game, this is when either 'quit' is typed
 		#into the prompt, the user correctly guesses the entire phrase, or the
 		#hangman is complete.
@@ -24,55 +24,56 @@ class Hangman
 			 "u" => false, "v" => false, "w" => false, "x" => false, "y" => false, 
 			 "z" => false}
 			 
-		#Build the targetWord from guessWord. Spaces are to be filtered out,
+		#Build the displayPhrase from guessPhrase. Spaces are to be filtered out,
 		#and blanks put in for each of the letters in the phrase.
-		@guessWord.each_char{|c|
+		@guessPhrase.each_char{|c|
 			if c == " "
-				@targetWord << " "
+				@displayPhrase << " "
 			else
-				@targetWord << "_"
-				@wordSize += 1
+				@displayPhrase << "_"
+				@phraseCount += 1
 			end
 		}
 	end
 		#attr_accessor :alpha
-		#attr_accessor :guessWord
-		#attr_accessor :targetWord
-		#attr_accessor :wordSize
+		#attr_accessor :guessPhrase
+		#attr_accessor :displayPhrase
+		#attr_accessor :phraseCount
 		#attr_accessor :letterCount
-		#attr_accessor :iteration
+		#attr_accessor :hangmanIteration
 		#attr_accessor :quit
 	
 	def start()
 		until @quit
 			#display data.
-			puts $hangman[@iteration]
-			puts @targetWord
+			puts $hangman[@hangmanIteration]
+			puts @displayPhrase
 			
 			#Get input from the user.
 			input = gets.chomp
-			puts "Entered #{input}"
+			puts "** Entered: #{input} **"
 	
 			#test input.
 			#if quitting then bail.
 			if input == "quit"
 				@quit = true
 			elsif input.size > 1
-				if input == @guessWord
+				if input == @guessPhrase
 					@quit = true
-					puts "Game Over, phrase correctly guessed"
-					puts $hangman[@iteration]
-					puts @guessWord
+					puts "** Game Over, phrase correctly guessed **"
+					puts $hangman[@hangmanIteration]
+					puts @guessPhrase
 			    else
-					puts "Not the correct phrase"
-					@iteration += 1
+					puts "** Not the correct phrase **"
+					@hangmanIteration += 1
 				end
 			#else check a letter has been input from the hash
 			elsif @alpha.has_key?(input)
 				testLetter input
 			else
 			#Error message for incorrect input.
-				puts "please either enter a letter a-z, the entire phrase to guess, or quit to exit"
+				print "** please either enter a letter a-z, ", 
+				"the entire phrase to guess, or quit to exit. **"
 			end
 		end
 	end
@@ -80,11 +81,11 @@ class Hangman
 	def testLetter(input)
 		#If the letter has been tried already
 		if @alpha[input]
-			puts "letter #{input} already tried"
+			puts "**letter #{input} already tried **"
 		#The letter has not been checked already, so mark it and test the string
 		else
 			@alpha[input] = true
-			atIndex = @guessWord.index(input)
+			atIndex = @guessPhrase.index(input)
 			#If we don't have a match, then mark it as such,
 			#then test for game over.
 			if atIndex == nil
@@ -97,32 +98,55 @@ class Hangman
 	end
 	
 	def indexNil
-		@iteration += 1
+		@hangmanIteration += 1
 		#quit if we have a hangman.
-		if @iteration == $hangman.size - 1
-			puts "Game Over, hangman complete"
+		if @hangmanIteration == $hangman.size - 1
+			puts "** Game Over, hangman complete **"
 			@quit = true
 			puts $hangman[$hangman.size - 1]
-			puts @guessWord
+			puts @guessPhrase
 		end
 	end
 	
 	def scanWord(input, atIndex)
 		while atIndex != nil
 			@letterCount += 1
-			@targetWord[atIndex] = input
+			@displayPhrase[atIndex] = input
 			#If we have the correct word size, then the game is over.
-			if @letterCount == @wordSize
-				puts "Game Over, correct phrase!"
-				puts $hangman[@iteration]
-				puts @guessWord
+			if @letterCount == @phraseCount
+				puts "** Game Over, correct phrase! **"
+				puts $hangman[@hangmanIteration]
+				puts @guessPhrase
 				@quit = true
 			#Test the string for more instances.
 			else 
-				atIndex = @guessWord.index(input, atIndex + 1)
+				atIndex = @guessPhrase.index(input, atIndex + 1)
 			end
 		end
 	end
+end
+
+if __FILE__ == $0
+	#Create an array for the phrases and populate it with the phrases obtained
+	#from phrases.txt
+	phrases = Array.new
+	begin
+		IO.foreach("phrases.txt") {|block| phrases[phrases.size] = block.chomp}
+		if phrases.size == 0
+			puts "** Abort, phrases is an empty file. **"
+		else
+			#Create a game, pass in the phrase, and start.
+			guessPhrase = phrases[rand(phrases.size)]
+			currentGame = Hangman.new guessPhrase
+			currentGame.start
+		end
+	rescue
+		puts "** Cannot open file phrases.txt, aborting **"
+	end
+	
+	#alpha.each do |key, value|
+	#	puts "key = #{key}, value = #{value}"
+	#end
 end
 
 #For ASCII hangman.
@@ -206,27 +230,3 @@ BEGIN {
 	$hangman[9] <<  "|\n"
 	$hangman[9] <<  "|_____________\n"
 }
-
-if __FILE__ == $0
-	#Create an array for the phrases and populate it with the phrases obtained
-	#from phrases.txt
-	phrases = Array.new
-	begin
-		IO.foreach("phrases.txt") {|block| phrases[phrases.size] = block.chomp}
-		if phrases.size == 0
-			puts "Abort, phrases is an empty file."
-		else
-			#Create a game, pass in the phrase, and start.
-			guessWord = phrases[rand(phrases.size)]
-			currentGame = Hangman.new guessWord
-			currentGame.start
-		end
-	rescue
-		puts "Cannot open file phrases.txt, aborting"
-	end
-	#Nothing in the array, something is wrong.
-	
-	#alpha.each do |key, value|
-	#	puts "key = #{key}, value = #{value}"
-	#end
-end
