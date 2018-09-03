@@ -126,6 +126,10 @@ class Hangman
 			end
 		end
 	end
+	
+	private :scanWord
+	private :indexNil
+	private :testLetter
 end
 
 #Loop to determine if the user wants to play again
