@@ -42,7 +42,7 @@ class Hangman
 		#attr_accessor :letterCount
 		#attr_accessor :hangmanIteration
 		#attr_accessor :quit
-	
+		
 	def start()
 		until @quit
 			#display data.
@@ -50,6 +50,7 @@ class Hangman
 			puts @displayPhrase
 			
 			#Get input from the user.
+			puts "** please enter a letter, the entire phrase, or quit. **"
 			input = gets.chomp
 			puts "** Entered: #{input} **"
 	
@@ -60,10 +61,10 @@ class Hangman
 			#Test for entire phrase.
 			elsif input.size > 1
 				if input == @guessPhrase
-					puts "** Game Over, phrase correctly guessed **"
-					@quit = true	
+					puts "** Game Over, phrase correctly guessed **"	
 					puts $hangman[@hangmanIteration]
 					puts @guessPhrase
+					@quit = true
 			    else
 					puts "** Not the correct phrase **"
 					@hangmanIteration += 1
@@ -103,9 +104,9 @@ class Hangman
 		#quit if we have a hangman.
 		if @hangmanIteration == $hangman.size - 1
 			puts "** Game Over, hangman complete **"
-			@quit = true
 			puts $hangman[$hangman.size - 1]
 			puts @guessPhrase
+			@quit = true
 		end
 	end
 	
@@ -127,21 +128,43 @@ class Hangman
 	end
 end
 
+#Loop to determine if the user wants to play again
+def playAgain
+	until false
+		puts "Play again? y/n"
+		input = gets.chomp
+		if input == "n"
+			return true
+		elsif input == "y"
+			return false
+		else
+			puts "please enter y/n"
+		end
+	end
+end
+
 if __FILE__ == $0
 	#Create an array for the phrases and populate it with the phrases obtained
 	#from phrases.txt
 	phrases = Array.new
+	quit = false
 	begin
 		IO.foreach("phrases.txt") {|block| phrases[phrases.size] = block.chomp}
 		if phrases.size == 0
 			puts "** Abort, phrases is an empty file. **"
 		else
-			#Create a game, pass in the phrase, and start.
-			guessPhrase = phrases[rand(phrases.size)]
-			currentGame = Hangman.new guessPhrase
-			currentGame.start
+			until quit
+				#Create a game, pass in the phrase, and start.
+				guessPhrase = phrases[rand(phrases.size)]
+				currentGame = Hangman.new guessPhrase
+				currentGame.start
+				
+				#Play again?
+				quit = playAgain		
+			end
 		end
-	rescue
+	rescue Exception => e
+		puts e.message
 		puts "** Cannot open file phrases.txt, aborting **"
 	end
 	
